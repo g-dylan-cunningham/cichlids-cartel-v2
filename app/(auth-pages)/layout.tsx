@@ -1,9 +1,20 @@
-export default async function Layout({
+'use client'
+
+import { CartProvider } from '@/lib/cart-context'
+import './globals.css'
+
+export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <div className="max-w-7xl flex flex-col gap-12 items-start">{children}</div>
-  );
+    <html lang="en">
+      <body>
+        <CartProvider>
+          {children}
+        </CartProvider>
+      </body>
+    </html>
+  )
 }

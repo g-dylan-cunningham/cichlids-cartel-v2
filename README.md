@@ -1,3 +1,30 @@
+# Updating the api
+This app uses google sheets api.
+spreadsheet: https://docs.google.com/spreadsheets/d/1uDhr4kEJS1AsrQ01llt8OPNgjvWszXLFa2eqYfqXlHM/edit?usp=sharing
+
+* update the spreadsheet in EXACTLY the same format as other rows. No new columns are available without code changes
+* changes should reflect in real time on the app.
+
+## Deploying changes without change api endpoint
+Best Practice: Use a "Latest" Deployment
+Go to Deploy > Manage deployments.
+
+You'll see a list of your deployments.
+
+Click the ⋮ three dots next to the version you want to keep using.
+
+Click "Update deployment" — this way, you're not creating a new deployment, but simply updating the existing one.
+
+The URL stays the same 🎉
+
+This is the cleanest way — keep reusing the same deployment, and the URL never changes.
+
+
+
+
+
+
+
 <a href="https://demo-nextjs-with-supabase.vercel.app/">
   <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
   <h1 align="center">Next.js and Supabase Starter Kit</h1>
