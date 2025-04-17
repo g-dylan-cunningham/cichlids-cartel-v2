@@ -1,4 +1,4 @@
-import { getFishStock, Fish } from '@/app/stock/stockActions'
+import { getFishStock } from '@/app/stock/stockActions'
 import { StockList } from '@/app/stock/stock-list'
 
 export default async function StockPage() {

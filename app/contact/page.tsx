@@ -2,12 +2,15 @@
 
 import { useState } from 'react'
 import { Navbar } from '@/components/navbar'
+import { useRouter } from 'next/navigation'
 
 export default function ContactPage() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     email: '',
     message: ''
   })
+  const [showDialog, setShowDialog] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -33,11 +36,16 @@ export default function ContactPage() {
       }
 
       setFormData({ email: '', message: '' })
-      alert('Thank you for your message. We will get back to you soon!')
+      setShowDialog(true)
     } catch (error) {
       console.error('Error submitting message:', error)
       alert('Failed to submit message. Please try again.')
     }
+  }
+
+  const handleDialogClose = () => {
+    setShowDialog(false)
+    router.push('/')
   }
 
   return (
@@ -118,6 +126,23 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
+
+      {showDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <h2 className="text-2xl font-bold mb-4">Thank You!</h2>
+            <p className="text-gray-600 mb-6">
+              Your message has been sent successfully. We will get back to you soon.
+            </p>
+            <button
+              onClick={handleDialogClose}
+              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Return to Home
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   )
 } 

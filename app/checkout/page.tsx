@@ -5,9 +5,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useCart } from '@/lib/cart-context'
 import { checkoutSchema, CheckoutFormData } from '@/lib/checkout-types'
 import { Navbar } from '@/components/navbar'
+import { useState } from 'react'
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const shippingCost = 39.99
   const tax = totalPrice * 0.08 // 8% tax
   const total = totalPrice + shippingCost + tax
@@ -21,34 +23,37 @@ export default function CheckoutPage() {
   })
 
   const onSubmit = async (data: CheckoutFormData) => {
-    const simplifiedItems = items.map(item => ({
-      id: item.id,
-      Species: item.Species,
-      CommonName: item.CommonName,
-      Size: item.Size,
-      Price: item.Price,
-      quantity: item.quantity
-    }))
-
-    // Create dynamic item fields
-    const dynamicItems = simplifiedItems.reduce((acc, item, index) => {
-      return {
-        ...acc,
-        [`item${index + 1}`]: `${item.Species} - ${item.Size} - $${item.Price} - qty: ${item.quantity} - ${item.CommonName} - id: ${item.id}`
-      }
-    }, {})
-
-    const orderData = {
-      ...data,
-      date: new Date().toISOString(),
-      ...dynamicItems,
-      subtotal: totalPrice,
-      shipping: shippingCost,
-      tax,
-      total,
-    }
-
+    if (isSubmitting) return // Prevent double submission
+    
+    setIsSubmitting(true)
     try {
+      const simplifiedItems = items.map(item => ({
+        id: item.id,
+        Species: item.Species,
+        CommonName: item.CommonName,
+        Size: item.Size,
+        Price: item.Price,
+        quantity: item.quantity
+      }))
+
+      // Create dynamic item fields
+      const dynamicItems = simplifiedItems.reduce((acc, item, index) => {
+        return {
+          ...acc,
+          [`item${index + 1}`]: `${item.Species} - ${item.Size} - $${item.Price} - qty: ${item.quantity} - ${item.CommonName} - id: ${item.id}`
+        }
+      }, {})
+
+      const orderData = {
+        ...data,
+        date: new Date().toISOString(),
+        ...dynamicItems,
+        subtotal: totalPrice,
+        shipping: shippingCost,
+        tax,
+        total,
+      }
+
       const response = await fetch('/api/order', {
         method: 'POST',
         headers: {
@@ -68,6 +73,8 @@ export default function CheckoutPage() {
       console.error('Error submitting order:', error)
       alert('Failed to submit order. Please try again.')
       // Cart data remains intact for retry
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -83,7 +90,7 @@ export default function CheckoutPage() {
               <label className="block text-sm font-medium text-gray-700">First Name</label>
               <input
                 {...register('firstName')}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
               {errors.firstName && (
                 <p className="mt-1 text-sm text-red-600">{errors.firstName.message}</p>
@@ -94,7 +101,7 @@ export default function CheckoutPage() {
               <label className="block text-sm font-medium text-gray-700">Last Name</label>
               <input
                 {...register('lastName')}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
               {errors.lastName && (
                 <p className="mt-1 text-sm text-red-600">{errors.lastName.message}</p>
@@ -106,7 +113,7 @@ export default function CheckoutPage() {
             <label className="block text-sm font-medium text-gray-700">Address Line 1</label>
             <input
               {...register('address1')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
             {errors.address1 && (
               <p className="mt-1 text-sm text-red-600">{errors.address1.message}</p>
@@ -117,7 +124,7 @@ export default function CheckoutPage() {
             <label className="block text-sm font-medium text-gray-700">Address Line 2</label>
             <input
               {...register('address2')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
           </div>
 
@@ -126,7 +133,7 @@ export default function CheckoutPage() {
               <label className="block text-sm font-medium text-gray-700">City</label>
               <input
                 {...register('city')}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
               {errors.city && (
                 <p className="mt-1 text-sm text-red-600">{errors.city.message}</p>
@@ -137,7 +144,7 @@ export default function CheckoutPage() {
               <label className="block text-sm font-medium text-gray-700">State</label>
               <input
                 {...register('state')}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
               {errors.state && (
                 <p className="mt-1 text-sm text-red-600">{errors.state.message}</p>
@@ -148,7 +155,7 @@ export default function CheckoutPage() {
               <label className="block text-sm font-medium text-gray-700">ZIP</label>
               <input
                 {...register('zip')}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
               {errors.zip && (
                 <p className="mt-1 text-sm text-red-600">{errors.zip.message}</p>
@@ -160,7 +167,7 @@ export default function CheckoutPage() {
             <label className="block text-sm font-medium text-gray-700">Phone</label>
             <input
               {...register('phone')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             />
             {errors.phone && (
               <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
@@ -171,7 +178,7 @@ export default function CheckoutPage() {
             <label className="block text-sm font-medium text-gray-700">Message</label>
             <textarea
               {...register('message')}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               rows={3}
             />
           </div>
@@ -199,9 +206,12 @@ export default function CheckoutPage() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            disabled={isSubmitting}
+            className={`w-full bg-blue-600 text-white py-3 rounded-lg transition-colors ${
+              isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
+            }`}
           >
-            Place Order
+            {isSubmitting ? 'Processing Order...' : 'Place Order'}
           </button>
         </form>
       </div>

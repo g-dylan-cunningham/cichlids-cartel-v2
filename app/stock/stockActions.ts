@@ -11,7 +11,7 @@ export async function getFishStock(): Promise<Fish[]> {
     console.log('Fetching from URL:', apiUrl) // Debug log
 
     const response = await fetch(apiUrl+"?route=stock", { 
-      next: { revalidate: 0 },
+      next: { revalidate: 3600 },
       headers: {
         'Accept': 'application/json',
       }

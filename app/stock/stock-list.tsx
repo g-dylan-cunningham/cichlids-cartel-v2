@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { Navbar } from '@/components/navbar'
-import { Fish } from '@/app/stock/stockActions'
+import { Fish } from '@/lib/types'
 import { useCart } from '@/lib/cart-context'
 
 export function StockList({ fishStock }: { fishStock: Fish[] }) {
