@@ -6,7 +6,25 @@ import { Navbar } from '@/components/navbar'
 import Link from 'next/link'
 
 export default function Cart() {
-  const { items, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart()
+  const { items, removeFromCart, updateQuantity, totalPrice, clearCart, isLoading } = useCart()
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen">
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Loading Your Cart</h1>
+            <p className="text-gray-600 mb-8">Please wait while we load your items...</p>
+            <div className="animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    )
+  }
 
   if (items.length === 0) {
     return (
@@ -36,49 +54,51 @@ export default function Cart() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             {items.map((item) => (
-              <div key={item.id} className="bg-white rounded-lg shadow-lg p-4 mb-4">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="relative h-20 w-20 sm:h-32 sm:w-32 flex-shrink-0">
+              <div
+                key={item.id}
+                className="bg-white rounded-lg shadow p-6 flex items-center gap-4"
+              >
+                <div className="flex flex-col sm:flex-row items-start gap-4">
+                  <div className="relative w-16 h-16 flex-shrink-0">
                     <Image
                       src={item.image || '/images/placeholder.jpg'}
                       alt={item.commonName}
                       fill
                       className="object-cover rounded-lg"
+                      unoptimized
                     />
                   </div>
-                  <div className="flex-grow min-w-0">
+                  <div className="text-left">
                     <h2 className="text-lg font-semibold truncate">{item.commonName}</h2>
                     <p className="text-sm text-gray-500 truncate">{item.species}</p>
                     <p className="text-sm text-gray-500">Size: {item.items[0].size}</p>
                     <p className="text-sm text-gray-500">Sex: {item.items[0].sex}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 border border-gray-300 rounded"
-                        >
-                          -
-                        </button>
-                        <span className="w-8 text-center">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 border border-gray-300 rounded"
-                        >
-                          +
-                        </button>
-                      </div>
-                      <button
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-sm text-red-500 hover:text-red-700"
-                      >
-                        Remove
-                      </button>
-                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-lg font-semibold text-blue-600 mt-2">
-                      ${item.items[0].price}
-                    </p>
+                </div>
+                <div className="flex flex-col items-end gap-2 ml-auto">
+                  <p className="text-lg font-semibold text-blue-600">
+                    ${item.items[0].price}
+                  </p>
+                  <button
+                    onClick={() => removeFromCart(item.id)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    Remove
+                  </button>
+                  <div className="flex items-center border rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition-colors"
+                    >
+                      -
+                    </button>
+                    <span className="px-4 py-1 bg-white border-x border-gray-200">{item.quantity}</span>
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition-colors"
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
               </div>

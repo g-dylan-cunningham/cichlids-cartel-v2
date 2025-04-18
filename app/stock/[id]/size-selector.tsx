@@ -10,6 +10,7 @@ interface SizeSelectorProps {
     category: string;
     images: string[];
     items: {
+      sku_id: string;
       size: string;
       price: number;
       sex: string;
@@ -21,13 +22,13 @@ export function SizeSelector({ species }: SizeSelectorProps) {
   const { addToCart } = useCart()
   const [isSubmitting, setIsSubmitting] = useState<{ [key: string]: boolean }>({})
 
-  const handleAddToCart = async (size: string, price: number, sex: string) => {
+  const handleAddToCart = async (size: string, price: number, sex: string, sku_id: string) => {
     if (isSubmitting[size]) return
     
     setIsSubmitting(prev => ({ ...prev, [size]: true }))
     try {
       const fish = {
-        id: `${species.species}-${size}-${sex}`.toLowerCase().replace(/\s+/g, '-'),
+        id: sku_id,
         date: new Date().toISOString().split('T')[0],
         category: species.category,
         species: species.species,
@@ -35,7 +36,8 @@ export function SizeSelector({ species }: SizeSelectorProps) {
         size: size,
         sex: sex || 'Unsexed',
         price: price,
-        image: species.images[0]
+        image: species.images[0],
+        sku_id: sku_id
       }
       addToCart(fish)
     } finally {
@@ -58,7 +60,7 @@ export function SizeSelector({ species }: SizeSelectorProps) {
                 <p className="text-2xl font-bold text-blue-600">${item.price}</p>
               </div>
               <button
-                onClick={() => handleAddToCart(item.size, item.price, item.sex || 'Unsexed')}
+                onClick={() => handleAddToCart(item.size, item.price, item.sex || 'Unsexed', item.sku_id)}
                 disabled={isSubmitting[item.size]}
                 className={`bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors ${
                   isSubmitting[item.size] ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'

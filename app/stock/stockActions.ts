@@ -7,6 +7,7 @@ interface Species {
   category: string;
   images: string[];
   items: {
+    sku_id: string;
     size: string;
     price: number;
     sex: string;
@@ -41,7 +42,10 @@ export async function getFishStock(): Promise<Species[]> {
     }
 
     const data = await response.json()
-    console.log('Raw API response:', JSON.stringify(data, null, 2))
+    console.log('Raw API response (first 3 items):', JSON.stringify({
+      ...data,
+      data: data.data?.slice(0, 3)
+    }, null, 2))
 
     if (!data.data) {
       throw new Error('Invalid data format: missing data property')
@@ -56,7 +60,7 @@ export async function getFishStock(): Promise<Species[]> {
       species.images?.length > 0
     )
 
-    console.log('Processed species data:', JSON.stringify(validSpecies, null, 2))
+    console.log('Processed species data (first 3 items):', JSON.stringify(validSpecies.slice(0, 3), null, 2))
     return validSpecies
   } catch (error) {
     console.error('Error fetching fish stock:', error)

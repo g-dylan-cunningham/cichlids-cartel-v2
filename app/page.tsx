@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { Navbar } from '@/components/navbar'
+import Link from 'next/link'
 
 export default function Home() {
   return (
@@ -49,9 +50,20 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-bold mb-4">Ready to Start Your Cichlid Journey?</h2>
             <p className="text-xl text-gray-600 mb-8">Browse our selection of premium African Cichlids and find the perfect additions to your aquarium.</p>
-            <a href="/stock" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-              Explore Our Collection
-            </a>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link
+                href="/stock"
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Explore Our Collection
+              </Link>
+              <Link
+                href="/about"
+                className="bg-white text-blue-600 px-6 py-3 rounded-lg border border-blue-600 hover:bg-blue-50 transition-colors"
+              >
+                Learn About Us
+              </Link>
+            </div>
           </div>
         </div>
       </div>

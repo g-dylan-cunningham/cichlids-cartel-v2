@@ -12,6 +12,7 @@ interface Species {
   category: string;
   images: string[];
   items: {
+    sku_id: string;
     size: string;
     price: number;
     sex: string;
@@ -33,6 +34,7 @@ interface CartContextType {
   totalItems: number
   totalPrice: number
   refreshCart: () => Promise<void>
+  isLoading: boolean
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -40,22 +42,33 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
+  const [isLoading, setIsLoading] = useState(true)
 
   // Initial cart setup
   const initializeCartData = async () => {
     try {
+      setIsLoading(true)
       const storedCart = initializeCart()
       const fishStock = await getFishStock()
       
       const cartItems = Object.entries(storedCart)
-        .map(([speciesId, quantity]) => {
-          const fish = fishStock.find(f => f.species.toLowerCase().replace(/\s+/g, '-') === speciesId)
+        .map(([skuId, quantity]) => {
+          // Find the species that contains this SKU
+          const fish = fishStock.find(f => 
+            f.items.some(item => item.sku_id === skuId)
+          )
           if (!fish) return null
+
+          // Find the specific item with matching SKU
+          const item = fish.items.find(i => i.sku_id === skuId)
+          if (!item) return null
+
           return { 
             ...fish, 
             quantity,
-            id: speciesId,
-            image: fish.images[0] || '/images/placeholder.jpg'
+            id: skuId,
+            image: fish.images[0] || '/images/placeholder.jpg',
+            items: [item] // Only include the matching SKU item
           }
         })
         .filter((item): item is CartItem => item !== null)
@@ -64,6 +77,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error initializing cart:', error)
       setItems([])
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -74,14 +89,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const fishStock = await getFishStock()
       
       const cartItems = Object.entries(storedCart)
-        .map(([speciesId, quantity]) => {
-          const fish = fishStock.find(f => f.species.toLowerCase().replace(/\s+/g, '-') === speciesId)
+        .map(([skuId, quantity]) => {
+          // Find the species that contains this SKU
+          const fish = fishStock.find(f => 
+            f.items.some(item => item.sku_id === skuId)
+          )
           if (!fish) return null
+
+          // Find the specific item with matching SKU
+          const item = fish.items.find(i => i.sku_id === skuId)
+          if (!item) return null
+
           return { 
             ...fish, 
             quantity,
-            id: speciesId,
-            image: fish.images[0] || '/images/placeholder.jpg'
+            id: skuId,
+            image: fish.images[0] || '/images/placeholder.jpg',
+            items: [item] // Only include the matching SKU item
           }
         })
         .filter((item): item is CartItem => item !== null)
@@ -114,16 +138,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = (fish: Fish) => {
     setItems(currentItems => {
-      const speciesId = fish.species.toLowerCase().replace(/\s+/g, '-')
-      const existingItem = currentItems.find(item => item.id === speciesId)
+      const existingItem = currentItems.find(item => item.id === fish.id)
       const newQuantity = (existingItem?.quantity || 0) + 1
       
       // Update localStorage
-      updateCartItem(speciesId, newQuantity)
+      updateCartItem(fish.id, newQuantity)
       
       if (existingItem) {
         return currentItems.map(item =>
-          item.id === speciesId
+          item.id === fish.id
             ? { ...item, quantity: newQuantity }
             : item
         )
@@ -136,12 +159,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
         category: fish.category,
         images: [fish.image || '/images/placeholder.jpg'],
         items: [{
+          sku_id: fish.id,
           size: fish.size,
           price: fish.price,
           sex: fish.sex
         }],
         quantity: 1,
-        id: speciesId,
+        id: fish.id,
         image: fish.image || '/images/placeholder.jpg'
       }
       
@@ -189,6 +213,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         totalItems,
         totalPrice,
         refreshCart,
+        isLoading
       }}
     >
       {children}

@@ -12,8 +12,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/stock', label: 'Stock' },
-    { href: '/about', label: 'About Us' },
-    { href: '/shipping', label: 'Shipping' },
+    { href: '/faq', label: 'FAQ' },
     { href: '/contact', label: 'Contact' },
   ]
 

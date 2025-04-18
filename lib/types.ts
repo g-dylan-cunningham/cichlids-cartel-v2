@@ -8,4 +8,5 @@ export interface Fish {
   sex: string;
   price: number;
   image: string;
+  sku_id: string;
 } 
