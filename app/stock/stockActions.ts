@@ -1,14 +1,26 @@
 import { Fish } from "@/lib/types";
 // const endpoint = "https://script.google.com/macros/s/AKfycbzsBeGY1VqyDIzsNNaGiCcsNzERAavvkBohGFaJdTgxwRDltE9UzvZiHCzODKszYmU-jw/exec";
 
-export async function getFishStock(): Promise<Fish[]> {
+interface Species {
+  species: string;
+  commonName: string;
+  category: string;
+  images: string[];
+  items: {
+    size: string;
+    price: number;
+    sex: string;
+  }[];
+}
+
+export async function getFishStock(): Promise<Species[]> {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_CMS_API
     if (!apiUrl) {
       throw new Error('CMS API URL is not configured')
     }
 
-    console.log('Fetching from URL:', apiUrl) // Debug log
+    console.log('Fetching from URL:', apiUrl)
 
     const response = await fetch(apiUrl+"?route=stock", { 
       next: { revalidate: 3600 },
@@ -17,41 +29,35 @@ export async function getFishStock(): Promise<Fish[]> {
       }
     })
 
-    console.log('Response status:', response.status) // Debug log
-    console.log('Response headers:', Object.fromEntries(response.headers.entries())) // Debug log
-
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('API Error Response:', errorText) // Debug log
       throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`)
     }
 
     const contentType = response.headers.get('content-type')
     if (!contentType?.includes('application/json')) {
       const text = await response.text()
-      console.error('Unexpected content type:', contentType)
-      console.error('Response body:', text)
       throw new Error(`Unexpected content type: ${contentType}`)
     }
 
     const data = await response.json()
-    console.log('Raw API response:', data) // Debug log
+    console.log('Raw API response:', JSON.stringify(data, null, 2))
 
     if (!data.data) {
       throw new Error('Invalid data format: missing data property')
     }
 
-    // Filter out any empty or invalid items
-    const validFish = data.data.filter((fish: any) => 
-      fish && 
-      fish.Species && 
-      fish.id &&
-      fish.CommonName && 
-      fish.Price !== undefined
+    // Filter out invalid species
+    const validSpecies = data.data.filter((species: any) => 
+      species && 
+      species.species && 
+      species.commonName && 
+      species.items?.length > 0 &&
+      species.images?.length > 0
     )
 
-    console.log('Processed fish data:', validFish) // Debug log
-    return validFish
+    console.log('Processed species data:', JSON.stringify(validSpecies, null, 2))
+    return validSpecies
   } catch (error) {
     console.error('Error fetching fish stock:', error)
     if (error instanceof Error) {
@@ -62,5 +68,18 @@ export async function getFishStock(): Promise<Fish[]> {
       })
     }
     return []
+  }
+}
+
+export async function getSpeciesById(id: string): Promise<Species | null> {
+  try {
+    const speciesList = await getFishStock()
+    const species = speciesList.find(s => 
+      s.species.toLowerCase().replace(/\s+/g, '-') === id
+    )
+    return species || null
+  } catch (error) {
+    console.error('Error fetching species:', error)
+    return null
   }
 } 

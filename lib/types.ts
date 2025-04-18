@@ -1,11 +1,11 @@
 export interface Fish {
   id: string;
-  Date: string;
-  Category: string;
-  Species: string;
-  CommonName: string;
-  Size: string;
-  Sex: string;
-  Price: number;
+  date: string;
+  category: string;
+  species: string;
+  commonName: string;
+  size: string;
+  sex: string;
+  price: number;
   image: string;
 } 

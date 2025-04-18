@@ -11,6 +11,7 @@ export default function ContactPage() {
     message: ''
   })
   const [showDialog, setShowDialog] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -22,6 +23,9 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isSubmitting) return // Prevent double submission
+    
+    setIsSubmitting(true)
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
@@ -40,6 +44,8 @@ export default function ContactPage() {
     } catch (error) {
       console.error('Error submitting message:', error)
       alert('Failed to submit message. Please try again.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -118,9 +124,12 @@ export default function ContactPage() {
 
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                disabled={isSubmitting}
+                className={`w-full bg-blue-600 text-white py-3 rounded-lg transition-colors ${
+                  isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
+                }`}
               >
-                Send Message
+                {isSubmitting ? 'Sending Message...' : 'Send Message'}
               </button>
             </form>
           </div>

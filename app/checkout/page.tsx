@@ -29,10 +29,10 @@ export default function CheckoutPage() {
     try {
       const simplifiedItems = items.map(item => ({
         id: item.id,
-        Species: item.Species,
-        CommonName: item.CommonName,
-        Size: item.Size,
-        Price: item.Price,
+        species: item.species,
+        commonName: item.commonName,
+        size: item.items[0].size,
+        price: item.items[0].price,
         quantity: item.quantity
       }))
 
@@ -40,7 +40,7 @@ export default function CheckoutPage() {
       const dynamicItems = simplifiedItems.reduce((acc, item, index) => {
         return {
           ...acc,
-          [`item${index + 1}`]: `${item.Species} - ${item.Size} - $${item.Price} - qty: ${item.quantity} - ${item.CommonName} - id: ${item.id}`
+          [`item${index + 1}`]: `${item.species} - ${item.size} - $${item.price} - qty: ${item.quantity} - ${item.commonName} - id: ${item.id}`
         }
       }, {})
 

@@ -6,8 +6,22 @@ import { initializeCart, updateCartItem, getCartItemQuantity, clearCart as clear
 import { getFishStock } from '@/app/stock/stockActions'
 // import { getFishStock } from './fish'
 
-interface CartItem extends Fish {
-  quantity: number
+interface Species {
+  species: string;
+  commonName: string;
+  category: string;
+  images: string[];
+  items: {
+    size: string;
+    price: number;
+    sex: string;
+  }[];
+}
+
+interface CartItem extends Species {
+  quantity: number;
+  id: string;
+  image: string;
 }
 
 interface CartContextType {
@@ -34,10 +48,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const fishStock = await getFishStock()
       
       const cartItems = Object.entries(storedCart)
-        .map(([id, quantity]) => {
-          const fish = fishStock.find(f => f.id === id)
+        .map(([speciesId, quantity]) => {
+          const fish = fishStock.find(f => f.species.toLowerCase().replace(/\s+/g, '-') === speciesId)
           if (!fish) return null
-          return { ...fish, quantity }
+          return { 
+            ...fish, 
+            quantity,
+            id: speciesId,
+            image: fish.images[0] || '/images/placeholder.jpg'
+          }
         })
         .filter((item): item is CartItem => item !== null)
       
@@ -55,10 +74,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const fishStock = await getFishStock()
       
       const cartItems = Object.entries(storedCart)
-        .map(([id, quantity]) => {
-          const fish = fishStock.find(f => f.id === id)
+        .map(([speciesId, quantity]) => {
+          const fish = fishStock.find(f => f.species.toLowerCase().replace(/\s+/g, '-') === speciesId)
           if (!fish) return null
-          return { ...fish, quantity }
+          return { 
+            ...fish, 
+            quantity,
+            id: speciesId,
+            image: fish.images[0] || '/images/placeholder.jpg'
+          }
         })
         .filter((item): item is CartItem => item !== null)
       
@@ -90,21 +114,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = (fish: Fish) => {
     setItems(currentItems => {
-      const existingItem = currentItems.find(item => item.id === fish.id)
+      const speciesId = fish.species.toLowerCase().replace(/\s+/g, '-')
+      const existingItem = currentItems.find(item => item.id === speciesId)
       const newQuantity = (existingItem?.quantity || 0) + 1
       
       // Update localStorage
-      updateCartItem(fish.id, newQuantity)
+      updateCartItem(speciesId, newQuantity)
       
       if (existingItem) {
         return currentItems.map(item =>
-          item.id === fish.id
+          item.id === speciesId
             ? { ...item, quantity: newQuantity }
             : item
         )
       }
       
-      return [...currentItems, { ...fish, quantity: 1 }]
+      // Transform Fish into CartItem
+      const newItem: CartItem = {
+        species: fish.species,
+        commonName: fish.commonName,
+        category: fish.category,
+        images: [fish.image || '/images/placeholder.jpg'],
+        items: [{
+          size: fish.size,
+          price: fish.price,
+          sex: fish.sex
+        }],
+        quantity: 1,
+        id: speciesId,
+        image: fish.image || '/images/placeholder.jpg'
+      }
+      
+      return [...currentItems, newItem]
     })
   }
 
@@ -135,7 +176,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }
 
   const totalItems = items.reduce((total, item) => total + item.quantity, 0)
-  const totalPrice = items.reduce((total, item) => total + (item.Price * item.quantity), 0)
+  const totalPrice = items.reduce((total, item) => total + (item.items[0].price * item.quantity), 0)
 
   return (
     <CartContext.Provider

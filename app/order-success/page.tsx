@@ -27,11 +27,11 @@ export default function OrderSuccess() {
           </div>
           
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Order Confirmed!
+            Order Confirmed
           </h1>
           
           <p className="text-lg text-gray-600 mb-8">
-            Thank you for your order. We will process it shortly and send you a confirmation email.
+            Thank you for choosing the Cichlid Cartel!
           </p>
 
           <div className="space-y-4">
@@ -43,19 +43,19 @@ export default function OrderSuccess() {
                 <svg className="h-5 w-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                You will receive an order confirmation email
+                You will receive an order confirmation email with billing details and payment options.
               </li>
               <li className="flex items-center">
                 <svg className="h-5 w-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                We will contact you to arrange shipping details
+                Upon payment, we will contact you to arrange shipping details
               </li>
               <li className="flex items-center">
                 <svg className="h-5 w-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Your fish will be shipped within 1-2 business days
+                Your fish will be shipped ASAP - don't worry, we'll keep you updated!
               </li>
             </ul>
           </div>
