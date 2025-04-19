@@ -24,7 +24,7 @@ export async function getFishStock(): Promise<Species[]> {
     console.log('Fetching from URL:', apiUrl)
 
     const response = await fetch(apiUrl+"?route=stock", { 
-      next: { revalidate: 3600 },
+      next: { revalidate: 10 },
       headers: {
         'Accept': 'application/json',
       }
@@ -56,8 +56,8 @@ export async function getFishStock(): Promise<Species[]> {
       species && 
       species.species && 
       species.commonName && 
-      species.items?.length > 0 &&
-      species.images?.length > 0
+      species.items?.length > 0 
+      // && species.images?.length > 0
     )
 
     console.log('Processed species data (first 3 items):', JSON.stringify(validSpecies.slice(0, 3), null, 2))

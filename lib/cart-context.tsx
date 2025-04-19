@@ -67,7 +67,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             ...fish, 
             quantity,
             id: skuId,
-            image: fish.images[0] || '/images/placeholder.jpg',
+            image: fish.images[0] || '/images/missing-cichlid.png',
             items: [item] // Only include the matching SKU item
           }
         })

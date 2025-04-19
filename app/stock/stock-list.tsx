@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { Navbar } from '@/components/navbar'
 import Link from 'next/link'
+import { FishImage } from '@/components/fish-image'
 
 interface Species {
   species: string;
@@ -29,41 +30,47 @@ export function StockList({ fishStock }: { fishStock: Species[] }) {
             const hasPriceRange = minPrice !== maxPrice
 
             return (
-              <Link 
+              <article 
                 key={species.species}
-                href={`/stock/${species.species.toLowerCase().replace(/\s+/g, '-')}`}
                 className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+                itemScope
+                itemType="https://schema.org/Product"
               >
                 <div className="relative h-64">
-                  {species.images[0] && (
-                    <Image
-                      src={species.images[0]}
-                      alt={species.commonName}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  )}
+                  <FishImage
+                    src={species.images[0] || '/images/missing-cichlid.png'}
+                    alt={`${species.commonName} - ${species.species}`}
+                    fill
+                    itemProp="image"
+                  />
                 </div>
                 <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-2">{species.commonName}</h2>
+                  <h2 className="text-xl font-semibold mb-2" itemProp="name">{species.commonName}</h2>
                   <div className="text-sm text-gray-500 mb-2">
-                    <span className="font-medium">Species:</span> {species.species}
+                    <span className="font-medium">Species:</span> <span itemProp="sku">{species.species}</span>
                   </div>
                   <div className="text-sm text-gray-500 mb-2">
-                    <span className="font-medium">Category:</span> {species.category}
+                    <span className="font-medium">Category:</span> <span itemProp="category">{species.category}</span>
                   </div>
                   <div className="text-sm text-gray-500 mb-4">
                     <span className="font-medium">Sex Options:</span> {Array.from(new Set(species.items.map(item => item.sex))).join(', ')}
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold text-blue-600">
-                      {hasPriceRange ? `$${minPrice} - $${maxPrice}` : `$${minPrice}`}
+                    <span className="text-2xl font-bold text-blue-600" itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                      <span itemProp="price">{hasPriceRange ? `$${minPrice} - $${maxPrice}` : `$${minPrice}`}</span>
+                      <meta itemProp="priceCurrency" content="USD" />
+                      <meta itemProp="availability" content="https://schema.org/InStock" />
                     </span>
-                    <span className="text-blue-600 font-medium">View Details →</span>
+                    <Link 
+                      href={`/stock/${species.species.toLowerCase().replace(/\s+/g, '-')}`}
+                      className="text-blue-600 font-medium"
+                      aria-label={`View details for ${species.commonName}`}
+                    >
+                      View Details →
+                    </Link>
                   </div>
                 </div>
-              </Link>
+              </article>
             )
           })}
         </div>
