@@ -16,7 +16,7 @@ interface Species {
 
 export async function getFishStock(): Promise<Species[]> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_CMS_API
+    const apiUrl = process.env.CMS_API
     if (!apiUrl) {
       throw new Error('CMS API URL is not configured')
     }

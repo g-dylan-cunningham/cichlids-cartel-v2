@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server'
 import { v4 as uuidv4 } from 'uuid'
 
-const NEXT_PUBLIC_CMS_API = process.env.NEXT_PUBLIC_CMS_API
+const CMS_API = process.env.CMS_API
 
-if (!NEXT_PUBLIC_CMS_API) {
-  throw new Error('NEXT_PUBLIC_CMS_API environment variable is not defined')
+if (!CMS_API) {
+  throw new Error('CMS_API environment variable is not defined')
 }
 
-const apiUrl = NEXT_PUBLIC_CMS_API + '?sheetName=inquiry' as string
+const apiUrl = CMS_API + '?sheetName=inquiry' as string
 
 export async function POST(request: Request) {
   try {

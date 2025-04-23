@@ -4,6 +4,14 @@ import { StockList } from '@/app/stock/stock-list'
 export default async function StockPage() {
   try {
     const fishStock = await getFishStock()
+    const response = await fetch(
+      `${process.env.CMS_API}/api/species?populate=*`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.CMS_API_TOKEN}`,
+        },
+      }
+    )
     return <StockList fishStock={fishStock} />
   } catch (error) {
     console.error('Error in StockPage:', error)
